@@ -1,8 +1,28 @@
 Tools : Alteryx was used to establish a connection to the database. The initial plan was to get a basic understanding of the data and create all necessary joins using Alteryx. Since the relevant table (tasks_used_da) only contained a few columns, I stopped using Alteryx and switched to Tableau to build out the calculations and queries.
 
-Process : A key concept for this project is the accurate identification of active and churned users. Having segmented users into these two categories, I felt that more granular insight was required. I therefore further segmented active users into four additional subcategories (weekly users, bi-weekly users, active users who have a moderate risk of churn and active users with a high risk of churn). The query that was used to generate this calculation is below;
+Process : A key concept for this project is the accurate identification of active and churned users. Having segmented users into these two categories, I felt that more granular insight was required. I therefore further segmented active users into four additional subcategories (weekly users, bi-weekly users, active users who have a moderate risk of churn and active users with a high risk of churn). These categories were used as the lens to view customer behavior throughout the dashboard. The query that was used to generate this calculation is below;
 
-These categories were used as the lens to view customer behavior throughout the dashboard. 
+IF DATEDIFF('day', {FIXED [User Id] : MAX([Date])},[Makedate YYMDD]) <= 28
+AND DATEDIFF('day', {FIXED [User Id] : MAX([Date])},[Makedate YYMDD]) >= 21
+AND {FIXED [User ID] : MAX([Sum Tasks Used])} > 0
+THEN 'Risk of Churn'
+
+ELSEIF DATEDIFF('day', {FIXED [User Id] : MAX([Date])},[Makedate YYMDD]) < 21
+AND DATEDIFF('day', {FIXED [User Id] : MAX([Date])},[Makedate YYMDD]) >= 14
+AND {FIXED [User ID] : MAX([Sum Tasks Used])} > 0
+THEN 'Moderate Churn'
+
+ELSEIF DATEDIFF('day', {FIXED [User Id] : MAX([Date])},[Makedate YYMDD]) < 14
+AND DATEDIFF('day', {FIXED [User Id] : MAX([Date])},[Makedate YYMDD]) >= 7
+AND {FIXED [User ID] : MAX([Sum Tasks Used])} > 0
+THEN 'Bi-Weekly Users'
+
+ELSEIF DATEDIFF('day', {FIXED [User Id] : MAX([Date])},[Makedate YYMDD]) < 7
+AND DATEDIFF('day', {FIXED [User Id] : MAX([Date])},[Makedate YYMDD]) >= 0
+AND {FIXED [User ID] : MAX([Sum Tasks Used])} > 0
+THEN 'Weekly Users'
+
+END
 
 Please note : The MakeDate YYMMDD calculated field was created as the source date column was represented in the year 2017. For the sake of the analysis (and given the 28 day criteria for active users), I therefore assumed today’s date was June 05, 2017.
 
